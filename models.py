@@ -26,6 +26,56 @@ class Owner(User):
         return f"{super().__str__()} | Tax Notice: {self.tax_assessment_notice}"
 
 
+class Vehicle:
+    def __init__(self, vehicle_id: int, plate: str, brand: str, model: str, owner_id: int):
+        self.vehicle_id = vehicle_id
+        self.plate = plate
+        self.brand = brand
+        self.model = model
+        self.owner_id = owner_id
+
+    def __str__(self) -> str:
+        return f"{self.vehicle_id}: {self.brand} {self.model} [{self.plate}]"
+
+
+class Car(Vehicle):
+    def __init__(self, vehicle_id: int, plate: str, brand: str, model: str,
+                 owner_id: int, number_of_doors: int, trunk_capacity: int):
+        super().__init__(vehicle_id, plate, brand, model, owner_id)
+        self.number_of_doors = number_of_doors
+        self.trunk_capacity = trunk_capacity
+
+    def __str__(self) -> str:
+        return (f"{super().__str__()} | Doors: {self.number_of_doors}, "
+                f"Trunk: {self.trunk_capacity}L")
+
+
+class Motorcycle(Vehicle):
+    def __init__(self, vehicle_id: int, plate: str, brand: str, model: str,
+                 owner_id: int, engine_cc: int, moto_type: str):
+        super().__init__(vehicle_id, plate, brand, model, owner_id)
+        self.engine_cc = engine_cc
+        self.moto_type = moto_type
+
+    def __str__(self) -> str:
+        return (f"{super().__str__()} | {self.engine_cc}cc, Type: {self.moto_type}")
+    
+    
+class Rental:
+    def __init__(self, rental_id: int, customer_id: int, vehicle_id: int,
+                 start_date: str, end_date: str, status: str):
+        self.rental_id = rental_id
+        self.customer_id = customer_id
+        self.vehicle_id = vehicle_id
+        self.start_date = start_date
+        self.end_date = end_date
+        self.status = status
+        self.rating = None
+
+    def __str__(self) -> str:
+        return (f"Rental {self.rental_id} - Customer {self.customer_id} -> "
+                f"Vehicle {self.vehicle_id} ({self.start_date} to {self.end_date})")
+
 
 class Rating:
     def __init__(self, rating_id: int, rental_id: int,
