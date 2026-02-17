@@ -22,7 +22,7 @@ class RentalSystem:
     # ---------------------------------------------------
     # DEMO DATA
     # ---------------------------------------------------
-     def _seed_demo_data(self):
+    def _seed_demo_data(self):
         owner = Owner(
             user_id=1,
             name="Γιάννης Παπαδόπουλος",
@@ -189,7 +189,7 @@ class RentalSystem:
         return rental
 
     # ---------------------------------------------------
-    # RATING 
+    # RATING (ΧΩΡΙΣ PRINT)
     # ---------------------------------------------------
     def submit_or_change_rating(self, customer_id: int, rental_id: int,
                                 score_vehicle: int, score_owner: int, comment: str):
@@ -227,5 +227,3 @@ class RentalSystem:
         print(f"Βαθμολογία οχήματος: {rating.score_vehicle}")
         print(f"Βαθμολογία ιδιοκτήτη: {rating.score_owner}")
         print(f"Σχόλιο: {rating.comment}")
-
- 
