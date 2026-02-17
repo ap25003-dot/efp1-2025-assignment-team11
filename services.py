@@ -2,25 +2,50 @@ from datetime import datetime, date
 from models import Customer, Owner, Vehicle, Car, Motorcycle, Rental, Rating
 
 
+def parse_date(date_str: str) -> date:
+    return datetime.strptime(date_str, "%Y-%m-%d").date()
 
 
 class RentalSystem:
     def __init__(self):
-    
-
+        self.customers: list[Customer] = []
+        self.owners: list[Owner] = []
         self.vehicles: list[Vehicle] = []
         self.rentals: list[Rental] = []
-      
+        self.ratings: list[Rating] = []
 
         self._next_rental_id = 1
-    
+        self._next_rating_id = 1
 
         self._seed_demo_data()
 
     # ---------------------------------------------------
     # DEMO DATA
     # ---------------------------------------------------
+     def _seed_demo_data(self):
+        owner = Owner(
+            user_id=1,
+            name="Γιάννης Παπαδόπουλος",
+            email="owner@mail.com",
+            tax_assessment_notice="TAX123"
+        )
+        self.owners.append(owner)
 
+        customer1 = Customer(
+            user_id=1,
+            name="Νίκος Κωνσταντίνου",
+            email="customer@mail.com",
+            driving_license="DL987"
+        )
+        self.customers.append(customer1)
+
+        customer2 = Customer(
+            user_id=2,
+            name="Μαρία Δημητρίου",
+            email="maria@mail.com",
+            driving_license="DL555"
+        )
+        self.customers.append(customer2)
 
         car = Car(
             vehicle_id=1,
@@ -106,9 +131,26 @@ class RentalSystem:
                 return v
         return None
 
+    def find_rental_by_id(self, rental_id: int):
+        for r in self.rentals:
+            if r.rental_id == rental_id:
+                return r
+        return None
 
+    def find_owner_by_id(self, owner_id: int):
+        for o in self.owners:
+            if o.user_id == owner_id:
+                return o
+        return None
 
+    # ---------------------------------------------------
+    # RENTAL FILTERING
+    # ---------------------------------------------------
+    def completed_rentals_for_customer(self, customer_id: int):
+        return [r for r in self.rentals if r.customer_id == customer_id and r.status == "completed"]
 
+    def pending_rentals_for_customer(self, customer_id: int):
+        return [r for r in self.rentals if r.customer_id == customer_id and r.status != "completed"]
 
     # ---------------------------------------------------
     # AVAILABILITY CHECK
@@ -146,5 +188,44 @@ class RentalSystem:
         self._next_rental_id += 1
         return rental
 
+    # ---------------------------------------------------
+    # RATING 
+    # ---------------------------------------------------
+    def submit_or_change_rating(self, customer_id: int, rental_id: int,
+                                score_vehicle: int, score_owner: int, comment: str):
+
+        rental = self.find_rental_by_id(rental_id)
+
+        if rental is None:
+            return None
+
+        rating = Rating(
+            rating_id=self._next_rating_id,
+            rental_id=rental_id,
+            score_vehicle=score_vehicle,
+            score_owner=score_owner,
+            comment=comment
+        )
+
+        rental.rating = rating
+        self.ratings.append(rating)
+        self._next_rating_id += 1
+
+        owner = self.find_owner_by_id(
+            self.find_vehicle_by_id(rental.vehicle_id).owner_id
+        )
+        self._notify_owner(owner, rating)
+
+        return rating
+
+    # ---------------------------------------------------
+    # EMAIL SIMULATION
+    # ---------------------------------------------------
+    def _notify_owner(self, owner, rating):
+        print(f"\n[EMAIL προς {owner.email}]")
+        print("Το όχημά σας έλαβε νέα αξιολόγηση.")
+        print(f"Βαθμολογία οχήματος: {rating.score_vehicle}")
+        print(f"Βαθμολογία ιδιοκτήτη: {rating.score_owner}")
+        print(f"Σχόλιο: {rating.comment}")
 
  
