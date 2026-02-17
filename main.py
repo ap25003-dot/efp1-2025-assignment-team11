@@ -1,4 +1,4 @@
-
+from services import RentalSystem
 from datetime import datetime, date
 
 
@@ -9,11 +9,94 @@ def parse_date(date_str):
         return None
 
 
+def main():
+    system = RentalSystem()
+    print("Καλωσήρθατε στο σύστημα ενοικίασης οχημάτων")
 
+    # LOGIN
+    while True:
+        name = input("Όνομα πελάτη: ")
+        email = input("Email πελάτη: ")
+
+        customer = system.find_customer(name, email)
+
+        if customer:
+            print(f"Καλώς ήρθες, {customer.name}!")
+            break
+        else:
+            print("Δεν βρέθηκε πελάτης με αυτά τα στοιχεία. Προσπαθήστε ξανά.")
+
+    while True:
+        print("\n--- Μενού ---")
+        print("1. Αναζήτηση οχήματος")
+        print("2. Προβολή των ενοικιάσεών μου")
+        print("0. Έξοδος")
 
         choice = input("Επιλογή: ")
 
+        # ---------------------------------------------------
+        # 1. Αναζήτηση οχήματος
+        # ---------------------------------------------------
+        if choice == "1":
 
+            # Έλεγχος ημερομηνιών
+            while True:
+                start_str = input("Ημερομηνία έναρξης (YYYY-MM-DD): ")
+                end_str = input("Ημερομηνία λήξης (YYYY-MM-DD): ")
+
+                start_date = parse_date(start_str)
+                end_date = parse_date(end_str)
+
+                if not start_date or not end_date:
+                    print("Μη έγκυρη μορφή ημερομηνίας.")
+                    continue
+
+                today = date.today()
+
+                if start_date < today:
+                    print("Η ημερομηνία έναρξης δεν μπορεί να είναι στο παρελθόν.")
+                    continue
+
+                if end_date < today:
+                    print("Η ημερομηνία λήξης δεν μπορεί να είναι στο παρελθόν.")
+                    continue
+
+                if end_date < start_date:
+                    print("Η ημερομηνία λήξης πρέπει να είναι μετά την έναρξη.")
+                    continue
+
+                break
+
+            available = system.search_available_vehicles(start_date, end_date)
+
+            if not available:
+                print("Δεν υπάρχουν διαθέσιμα οχήματα.")
+                continue
+
+            print("\nΔιαθέσιμα οχήματα:")
+            for v in available:
+                print(v)
+
+            # Επιλογή οχήματος με επανάληψη
+            while True:
+                try:
+                    vehicle_id = int(input("Δώσε ID οχήματος για κράτηση: "))
+                except ValueError:
+                    print("Το ID πρέπει να είναι αριθμός.")
+                    continue
+
+                vehicle = system.find_vehicle_by_id(vehicle_id)
+
+                if not vehicle:
+                    print("Δεν υπάρχει όχημα με αυτό το ID.")
+                    continue
+
+                
+                break
+
+            rental = system.create_rental(customer.user_id, vehicle_id, start_str, end_str)
+            print("Η κράτηση ολοκληρώθηκε:")
+            print(rental)
 
         # ---------------------------------------------------
         # 2. Προβολή ενοικιάσεων
